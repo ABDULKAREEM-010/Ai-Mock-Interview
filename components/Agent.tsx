@@ -1,3 +1,4 @@
+'use client'
 import { cn } from '@/lib/utils';
 import Image from 'next/image'
 import React from 'react'
@@ -11,8 +12,9 @@ enum callStatus{
 const Agent = ({userName}:AgentProps) => {
     const isSpeaking = true;
     const [currentCallStatus, setCurrentCallStatus] = React.useState<callStatus>(callStatus.INACTIVE);
-
-  return (
+    const messages = ['whats your name?','My name is Abdul Kareem,nice to meet you']
+    const lastMessage = messages[messages.length -1];
+    return (
     <>
     <div className='call-view'>
         <div className="card-interview">
@@ -30,9 +32,20 @@ const Agent = ({userName}:AgentProps) => {
             </div>
         </div>
     </div>
+    {
+      messages.length > 0 && (
+        <div className='transcript-border'>
+          <div className='transcript'>
+            <p key={lastMessage} className={cn('transition-opacity duration-500 opacity-0','animate-fadeIn opacity-100')}>
+              {lastMessage}
+            </p>
+          </div>
+        </div>
+      )
+    }
     <div className="w-full flex justify-center">
         {currentCallStatus !== callStatus.ACTIVE ? (
-          <button className="relative btn-call" onClick={() => handleCall()}>
+          <button className="relative btn-call" >
             <span
               className={cn(
                 "absolute animate-ping rounded-full opacity-75",
@@ -47,7 +60,7 @@ const Agent = ({userName}:AgentProps) => {
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect" onClick={() => handleDisconnect()}>
+          <button className="btn-disconnect" >
             End
           </button>
         )}
