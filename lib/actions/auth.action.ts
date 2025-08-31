@@ -2,7 +2,6 @@
 
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
-import { FirebaseError } from "firebase-admin"; // for typed error handling
 
 // Session duration (1 week)
 const SESSION_DURATION = 60 * 60 * 24 * 7;
@@ -53,8 +52,13 @@ export async function signUp(params: SignUpParams) {
   } catch (error: unknown) {
     console.error("Error creating user:", error);
 
-    // Handle Firebase specific errors
-    if (error instanceof FirebaseError && error.code === "auth/email-already-exists") {
+    // Handle Firebase-specific error
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code?: string }).code === "auth/email-already-exists"
+    ) {
       return {
         success: false,
         message: "This email is already in use",
@@ -121,7 +125,7 @@ export async function getCurrentUser(): Promise<User | null> {
       ...userRecord.data(),
       id: userRecord.id,
     } as User;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error verifying session:", error);
 
     // Invalid or expired session
